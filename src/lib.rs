@@ -1,5 +1,5 @@
 #![deny(missing_docs)]
-#![deny(unsafe_code)]
+#![forbid(unsafe_code)]
 
 //! This crate provides a [Bevy](https://bevyengine.org/) plugin for integrating with
 //! the Steamworks SDK.
@@ -57,11 +57,6 @@
 //! }
 //! ```
 
-mod input_glyph;
-
-pub use input_glyph::{InputGlyphBaseStyle, InputGlyphSize, InputGlyphStyle};
-pub use steamworks_sys::EInputActionOrigin;
-
 use std::{ops::Deref, sync::Mutex};
 
 use bevy_app::{App, First, Plugin};
@@ -72,6 +67,10 @@ use bevy_ecs::{
     system::Res,
 };
 
+/// The raw Steamworks bindings, for naming types such as `EInputActionOrigin`.
+#[cfg(feature = "raw-bindings")]
+pub use steamworks::sys;
+
 // Reexport everything from steamworks except for the clients
 pub use steamworks::{
     networking_messages, networking_sockets, networking_types, networking_utils,
@@ -81,19 +80,19 @@ pub use steamworks::{
     CreateQueryError, DistanceFilter, DownloadItemResult, FileType,
     FloatingGamepadTextInputDismissed, FloatingGamepadTextInputMode, Friend, FriendFlags,
     FriendGame, FriendState, Friends, GameId, GameLobbyJoinRequested, GameOverlayActivated,
-    GamepadTextInputDismissed, GamepadTextInputLineMode, GamepadTextInputMode, Input, InstallInfo,
-    InvalidErrorCode, ItemState, Leaderboard, LeaderboardDataRequest, LeaderboardDisplayType,
-    LeaderboardEntry, LeaderboardScoreUploaded, LeaderboardSortMethod, LobbyChatMsg,
-    LobbyChatUpdate, LobbyCreated, LobbyDataUpdate, LobbyEnter, LobbyId, LobbyKey,
-    LobbyKeyTooLongError, LobbyListFilter, LobbyType, Matchmaking, MicroTxnAuthorizationResponse,
-    NearFilter, NearFilters, Networking, NotificationPosition, NumberFilter, NumberFilters,
-    OverlayToStoreFlag, P2PSessionConnectFail, P2PSessionRequest, PersonaChange,
-    PersonaStateChange, PublishedFileId, PublishedFileVisibility, QueryHandle, QueryResult,
-    QueryResults, RemotePlay, RemotePlayConnected, RemotePlayDisconnected, RemotePlaySession,
-    RemotePlaySessionId, RemoteStorage, SIResult, SResult, SendType, Server, ServerMode,
-    SteamAPIInitError, SteamDeviceFormFactor, SteamError, SteamFile, SteamFileInfo,
-    SteamFileReader, SteamFileWriter, SteamId, SteamServerConnectFailure, SteamServersConnected,
-    SteamServersDisconnected, StringFilter, StringFilterKind, StringFilters,
+    GamepadTextInputDismissed, GamepadTextInputLineMode, GamepadTextInputMode, Input,
+    InputGlyphBaseStyle, InputGlyphSize, InputGlyphStyle, InstallInfo, InvalidSteamError,
+    ItemState, Leaderboard, LeaderboardDataRequest, LeaderboardDisplayType, LeaderboardEntry,
+    LeaderboardScoreUploaded, LeaderboardSortMethod, LobbyChatMsg, LobbyChatUpdate, LobbyCreated,
+    LobbyDataUpdate, LobbyEnter, LobbyId, LobbyKey, LobbyKeyTooLongError, LobbyListFilter,
+    LobbyType, Matchmaking, MicroTxnAuthorizationResponse, NearFilter, NearFilters, Networking,
+    NotificationPosition, NumberFilter, NumberFilters, OverlayToStoreFlag, P2PSessionConnectFail,
+    P2PSessionRequest, PersonaChange, PersonaStateChange, PublishedFileId, PublishedFileVisibility,
+    QueryHandle, QueryResult, QueryResults, RemotePlay, RemotePlayConnected,
+    RemotePlayDisconnected, RemotePlaySession, RemotePlaySessionId, RemoteStorage, SendType,
+    Server, ServerMode, SteamAPIInitError, SteamDeviceFormFactor, SteamError, SteamFile,
+    SteamFileInfo, SteamFileReader, SteamFileWriter, SteamId, SteamServerConnectFailure,
+    SteamServersConnected, SteamServersDisconnected, StringFilter, StringFilterKind, StringFilters,
     TicketForWebApiResponse, UGCContentDescriptorID, UGCQueryType, UGCStatisticType, UGCType,
     Universe, UpdateHandle, UpdateStatus, UpdateWatchHandle, UploadScoreMethod, User,
     UserAchievementStored, UserList, UserListOrder, UserStats, UserStatsReceived, UserStatsStored,
