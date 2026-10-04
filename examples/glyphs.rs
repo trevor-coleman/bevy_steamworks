@@ -49,7 +49,11 @@ fn print_glyphs(client: Res<Client>, mut exit: MessageWriter<AppExit>) {
 
     for (origin_name, origin) in origins {
         println!("\n== {origin_name} ==");
-        println!("legacy: {:?}", input.get_glyph_for_action_origin(origin));
+        // The legacy wrapper dereferences the returned pointer without a null check, and Steam
+        // returns null for `None`, so calling it with that origin segfaults.
+        if origin != EInputActionOrigin::k_EInputActionOrigin_None {
+            println!("legacy: {:?}", input.get_glyph_for_action_origin(origin));
+        }
         for (base_name, base) in bases {
             for (neutral, solid) in [(false, false), (true, false), (false, true), (true, true)] {
                 let style = InputGlyphStyle::new(base)
