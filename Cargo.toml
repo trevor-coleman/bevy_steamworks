@@ -23,7 +23,7 @@ bevy = "0.19"
 
 # Temporary: styled Steam Input glyph support, pending an upstream steamworks release.
 [patch.crates-io]
-steamworks = { git = "https://github.com/trevor-coleman/steamworks-rs", branch = "claude/peaceful-hopper-9du2dl" }
+steamworks = { git = "https://github.com/trevor-coleman/steamworks-rs", rev = "ecc66bb" }
 
 [[example]]
 name = "glyphs"

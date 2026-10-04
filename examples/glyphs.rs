@@ -41,8 +41,8 @@ fn print_glyphs(client: Res<Client>, mut exit: MessageWriter<AppExit>) {
     ];
 
     let (mut found, mut missing, mut dangling) = (0, 0, 0);
-    // Steam returns paths with mixed `\\` and `/` separators on macOS, so also check the path
-    // with backslashes replaced.
+    // Steam returns paths with mixed `\\` and `/` separators on non-Windows platforms, which
+    // `steamworks` normalises. This counter is a regression check: it should stay at 0.
     let mut fixed = 0;
     let mut tally = |path: &Option<String>| match path {
         Some(path) if Path::new(path).exists() => found += 1,
@@ -57,11 +57,7 @@ fn print_glyphs(client: Res<Client>, mut exit: MessageWriter<AppExit>) {
 
     for (origin_name, origin) in origins {
         println!("\n== {origin_name} ==");
-        // The legacy wrapper dereferences the returned pointer without a null check, and Steam
-        // returns null for `None`, so calling it with that origin segfaults.
-        if origin != EInputActionOrigin::k_EInputActionOrigin_None {
-            println!("legacy: {:?}", input.get_glyph_for_action_origin(origin));
-        }
+        println!("legacy: {:?}", input.get_glyph_for_action_origin(origin));
         for (base_name, base) in bases {
             for (neutral, solid) in [(false, false), (true, false), (false, true), (true, true)] {
                 let style = InputGlyphStyle::new(base)
