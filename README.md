@@ -75,6 +75,17 @@ fn main() {
 }
 ```
 
+## Steam Input glyph styles
+
+`Input::get_glyph_png_for_action_origin` and `get_glyph_svg_for_action_origin` return glyphs in a
+chosen size and style (`InputGlyphSize`, `InputGlyphStyle`). They are currently only available
+through a `steamworks` fork (see the `[patch.crates-io]` entry in `Cargo.toml`). To try them
+against a running Steam client:
+
+```sh
+cargo run --example glyphs --features raw-bindings
+```
+
 ## Bevy Version Supported
 
 |Bevy Version |bevy\_steamworks|

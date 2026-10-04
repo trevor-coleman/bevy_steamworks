@@ -40,6 +40,13 @@ fn print_glyphs(client: Res<Client>, mut exit: MessageWriter<AppExit>) {
         ("dark", InputGlyphBaseStyle::Dark),
     ];
 
+    let (mut found, mut missing, mut dangling) = (0, 0, 0);
+    let mut tally = |path: &Option<String>| match path {
+        Some(path) if Path::new(path).exists() => found += 1,
+        Some(_) => dangling += 1,
+        None => missing += 1,
+    };
+
     for (origin_name, origin) in origins {
         println!("\n== {origin_name} ==");
         println!("legacy: {:?}", input.get_glyph_for_action_origin(origin));
@@ -50,7 +57,9 @@ fn print_glyphs(client: Res<Client>, mut exit: MessageWriter<AppExit>) {
                     .solid_abxy(solid);
                 let label = format!("{base_name} neutral={neutral} solid={solid}");
                 for (size_name, size) in sizes {
-                    match input.get_glyph_png_for_action_origin(origin, size, style) {
+                    let png = input.get_glyph_png_for_action_origin(origin, size, style);
+                    tally(&png);
+                    match png {
                         Some(path) => println!(
                             "png {label} {size_name}: {path} (exists: {})",
                             Path::new(&path).exists()
@@ -58,7 +67,9 @@ fn print_glyphs(client: Res<Client>, mut exit: MessageWriter<AppExit>) {
                         None => println!("png {label} {size_name}: None"),
                     }
                 }
-                match input.get_glyph_svg_for_action_origin(origin, style) {
+                let svg = input.get_glyph_svg_for_action_origin(origin, style);
+                tally(&svg);
+                match svg {
                     Some(path) => println!(
                         "svg {label}: {path} (exists: {})",
                         Path::new(&path).exists()
@@ -68,14 +79,23 @@ fn print_glyphs(client: Res<Client>, mut exit: MessageWriter<AppExit>) {
             }
         }
     }
+    println!("\nfiles found: {found}, returned None: {missing}, path returned but missing on disk: {dangling}");
     exit.write(AppExit::Success);
 }
 
 fn main() {
     // Use the demo Steam AppId for SpaceWar
+    let steam = match SteamworksPlugin::init_app(480) {
+        Ok(steam) => steam,
+        Err(err) => {
+            eprintln!("Failed to initialize Steam: {err}");
+            eprintln!("Make sure the Steam client is running and logged in.");
+            std::process::exit(1);
+        }
+    };
     App::new()
         .add_plugins(MinimalPlugins)
-        .add_plugins(SteamworksPlugin::init_app(480).unwrap())
+        .add_plugins(steam)
         .add_systems(Startup, print_glyphs)
         .run();
 }
