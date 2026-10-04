@@ -41,9 +41,17 @@ fn print_glyphs(client: Res<Client>, mut exit: MessageWriter<AppExit>) {
     ];
 
     let (mut found, mut missing, mut dangling) = (0, 0, 0);
+    // Steam returns paths with mixed `\\` and `/` separators on macOS, so also check the path
+    // with backslashes replaced.
+    let mut fixed = 0;
     let mut tally = |path: &Option<String>| match path {
         Some(path) if Path::new(path).exists() => found += 1,
-        Some(_) => dangling += 1,
+        Some(path) => {
+            dangling += 1;
+            if Path::new(&path.replace('\\', "/")).exists() {
+                fixed += 1;
+            }
+        }
         None => missing += 1,
     };
 
@@ -83,7 +91,10 @@ fn print_glyphs(client: Res<Client>, mut exit: MessageWriter<AppExit>) {
             }
         }
     }
-    println!("\nfiles found: {found}, returned None: {missing}, path returned but missing on disk: {dangling}");
+    println!(
+        "\nfiles found: {found}, returned None: {missing}, path returned but missing on disk: \
+         {dangling} (of which exist after replacing backslashes: {fixed})"
+    );
     exit.write(AppExit::Success);
 }
 
