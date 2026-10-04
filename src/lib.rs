@@ -1,5 +1,5 @@
 #![deny(missing_docs)]
-#![forbid(unsafe_code)]
+#![deny(unsafe_code)]
 
 //! This crate provides a [Bevy](https://bevyengine.org/) plugin for integrating with
 //! the Steamworks SDK.
@@ -56,6 +56,11 @@
 //!       .run();
 //! }
 //! ```
+
+mod input_glyph;
+
+pub use input_glyph::{InputGlyphBaseStyle, InputGlyphSize, InputGlyphStyle};
+pub use steamworks_sys::EInputActionOrigin;
 
 use std::{ops::Deref, sync::Mutex};
 
